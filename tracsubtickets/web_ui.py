@@ -98,10 +98,11 @@ class SubTicketsModule(Component):
         if not db:
             db = self.env.get_db_cnx()
         cursor = db.cursor()
-        cursor.execute("SELECT parent, child FROM subtickets WHERE parent=%s",
+        cursor.execute("SELECT parent, child FROM subtickets WHERE parent='%s'",
                        (parent_id, ))
 
         for parent, child in cursor:
+            printf('Parent: %s has child: %s', parent, child)
             children[child] = None
 
         for id in children:
@@ -115,7 +116,7 @@ class SubTicketsModule(Component):
             db = self.env.get_db_cnx()
             cursor = db.cursor()
 
-            cursor.execute("SELECT parent, child FROM subtickets WHERE parent=%s",
+            cursor.execute("SELECT parent, child FROM subtickets WHERE parent='%s'",
                            (ticket.id, ))
 
             for parent, child in cursor:
@@ -146,7 +147,8 @@ class SubTicketsModule(Component):
                     link = None
                 div.append(tag.h3(_('Subtickets '), link))
 
-            if 'subtickets' in data:
+            if 'subtickets' in data:i
+                printf("Subtickets in data")
                 # table
                 tbody = tag.tbody()
                 div.append(tag.table(tbody, class_='subtickets'))
