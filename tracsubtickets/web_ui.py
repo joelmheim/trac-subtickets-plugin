@@ -98,26 +98,21 @@ class SubTicketsModule(Component):
         if not db:
             db = self.env.get_db_cnx()
         cursor = db.cursor()
-        cursor.execute("SELECT parent, child FROM subtickets WHERE parent='%s'",
-                       (parent_id, ))
-
+        cursor.execute("SELECT parent, child FROM subtickets WHERE parent='%s'" % parent_id)
         for parent, child in cursor:
-            printf('Parent: %s has child: %s', parent, child)
             children[child] = None
 
         for id in children:
             children[id] = self.get_children(id, db)
 
         return children
-        
+
     def validate_ticket(self, req, ticket):
         action = req.args.get('action')
         if action == 'resolve':
             db = self.env.get_db_cnx()
             cursor = db.cursor()
-
-            cursor.execute("SELECT parent, child FROM subtickets WHERE parent='%s'",
-                           (ticket.id, ))
+            cursor.execute("SELECT parent, child FROM subtickets WHERE parent='%s'" % ticket.id)
 
             for parent, child in cursor:
                 if Ticket(self.env, child)['status'] != 'closed':
@@ -147,8 +142,7 @@ class SubTicketsModule(Component):
                     link = None
                 div.append(tag.h3(_('Subtickets '), link))
 
-            if 'subtickets' in data:i
-                printf("Subtickets in data")
+            if 'subtickets' in data:
                 # table
                 tbody = tag.tbody()
                 div.append(tag.table(tbody, class_='subtickets'))
