@@ -37,9 +37,7 @@ from genshi.filters import Transformer
 
 from api import NUMBERS_RE, _
 
-
 class SubTicketsModule(Component):
-
     implements(ITemplateProvider,
                IRequestFilter,
                ITicketManipulator,
@@ -94,12 +92,15 @@ class SubTicketsModule(Component):
         pass
 
     def get_children(self, parent_id, db=None):
+        self.log.debug("Get children for parent: %s" % parent_id)
         children = {}
         if not db:
             db = self.env.get_db_cnx()
         cursor = db.cursor()
-        cursor.execute("SELECT parent, child FROM subtickets WHERE parent='%s'" % parent_id)
+        self.log.debug("SELECT parent, child FROM subtickets WHERE parent='%s'" % parent_id)
+        cursor.execute("SELECT parent, child FROM subtickets WHERE parent='%s'", [parent_id])
         for parent, child in cursor:
+            self.log.debug("Parent %s has child %s" % (parent, child))
             children[child] = None
 
         for id in children:
@@ -112,7 +113,7 @@ class SubTicketsModule(Component):
         if action == 'resolve':
             db = self.env.get_db_cnx()
             cursor = db.cursor()
-            cursor.execute("SELECT parent, child FROM subtickets WHERE parent='%s'" % ticket.id)
+            cursor.execute("SELECT parent, child FROM subtickets WHERE parent='%s'", (ticket.id, ))
 
             for parent, child in cursor:
                 if Ticket(self.env, child)['status'] != 'closed':
@@ -123,7 +124,7 @@ class SubTicketsModule(Component):
             for id in ids:
                 if Ticket(self.env, id)['status'] == 'closed':
                     yield None, _('Parent ticket #%s is closed') % id
-
+        env.log.debug("Valid ticket with subtickets.")
     # ITemplateStreamFilter method
     def filter_stream(self, req, method, filename, stream, data):
         if req.path_info.startswith('/ticket/'):
