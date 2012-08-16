@@ -143,10 +143,11 @@ class SubTicketsSystem(Component):
 
         db = self.env.get_db_cnx()
         cursor = db.cursor()
-        self.log.debug("Old parents should be removed.")
+
         # remove old parents
         for parent in old_parents - new_parents:
-            cursor.execute("DELETE FROM subtickets WHERE parent='%s' AND child='%s'", (parent, ticket.id))
+            cursor.execute("DELETE FROM subtickets WHERE parent = %s AND child = %s", [str(parent), str(ticket.id)] )
+
         # add new parents
         for parent in new_parents - old_parents:
             cursor.execute("INSERT INTO subtickets VALUES(%s, %s)", (parent, ticket.id))

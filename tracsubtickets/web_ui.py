@@ -96,11 +96,11 @@ class SubTicketsModule(Component):
         children = {}
         if not db:
             db = self.env.get_db_cnx()
+
         cursor = db.cursor()
-        self.log.debug("SELECT parent, child FROM subtickets WHERE parent='%s'" % parent_id)
-        cursor.execute("SELECT parent, child FROM subtickets WHERE parent='%s'", [parent_id])
+        cursor.execute("SELECT parent, child FROM subtickets WHERE parent = %s", [str(parent_id)] )
+
         for parent, child in cursor:
-            self.log.debug("Parent %s has child %s" % (parent, child))
             children[child] = None
 
         for id in children:
@@ -124,7 +124,7 @@ class SubTicketsModule(Component):
             for id in ids:
                 if Ticket(self.env, id)['status'] == 'closed':
                     yield None, _('Parent ticket #%s is closed') % id
-        env.log.debug("Valid ticket with subtickets.")
+
     # ITemplateStreamFilter method
     def filter_stream(self, req, method, filename, stream, data):
         if req.path_info.startswith('/ticket/'):
