@@ -157,7 +157,7 @@ class SubTicketsSystem(Component):
         db = self.env.get_db_cnx()
         cursor = db.cursor()
         # TODO: check if there's any child ticket
-        cursor.execute("DELETE FROM subtickets WHERE child='%s'", (ticket.id, ))
+        cursor.execute("DELETE FROM subtickets WHERE child=%s", [str(ticket.id)])
         db.commit()
 
     # ITicketManipulator methods
@@ -187,7 +187,7 @@ class SubTicketsSystem(Component):
             def _check_parents(id, all_parents):
                 all_parents = all_parents + [id]
                 errors = []
-                cursor.execute("SELECT parent FROM subtickets WHERE child='%s'", (id, ))
+                cursor.execute("SELECT parent FROM subtickets WHERE child=%s", [str(id)])
                 for x in [int(x[0]) for x in cursor]:
                     if x in all_parents:
                         error = ' > '.join(['#%s' % n for n in all_parents + [x]])
